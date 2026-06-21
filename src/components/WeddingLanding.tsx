@@ -87,6 +87,7 @@ const gifts: Gift[] = [
   {
     name: "Lenço para lágrimas de alegria da noiva",
     price: "R$ 50,00",
+    image: "/assets/17-item-noiva-chorando.webp",
   },
   {
     name: "Sabugo caso acabe o papel higiênico",
