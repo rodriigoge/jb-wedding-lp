@@ -272,10 +272,14 @@ export function WeddingLanding() {
             </dl>
           </div>
 
-          <figure className="section-media">
+          <figure className="section-media ceremony-media">
             <img
-              src="/assets/igreja.png"
-              alt="Igreja São Geraldo Magela"
+              src="/assets/igreja.webp"
+              alt="Fachada da Igreja São Geraldo Magela"
+            />
+            <img
+              src="/assets/igreja-02.webp"
+              alt="Interior da Igreja São Geraldo Magela"
             />
           </figure>
         </div>
@@ -456,7 +460,7 @@ export function WeddingLanding() {
             <p>
               Para nos ajudar a preparar uma celebração perfeita e confortável
               para todos, pedimos a gentileza de confirmar sua presença até o
-              dia <b>10/09/2026</b>.
+              dia <b>03/09/26</b>.
             </p>
             <p>
               Caso a presença não seja confirmada até essa data, entenderemos
@@ -469,7 +473,7 @@ export function WeddingLanding() {
 
             <div className="presence-deadline">
               <span>Data limite</span>
-              <strong>10/09/2026</strong>
+              <strong>03/09/26</strong>
             </div>
 
             <figure className="attention-media">

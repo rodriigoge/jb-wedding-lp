@@ -46,9 +46,9 @@ pnpm dev:vite
 
 ## Assets
 
-Os arquivos originais ficam em `assets/`.
+Todos os assets usados pela aplicação ficam em `public/assets/`, pois essa é a pasta servida publicamente pelo Next.js.
 
-Os arquivos usados pela aplicação devem estar em `public/assets/`, pois essa é a pasta servida publicamente pelo Next.js.
+No código, as imagens são referenciadas com caminhos como `/assets/nome-do-arquivo.webp`.
 
 ## Observações
 
