@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from "react";
+import { getSupabaseBrowserClient } from "@/lib/supabase";
 
 const menuLeft = [
   { label: "Cerimônia", href: "#cerimonia" },
@@ -154,7 +155,10 @@ export function WeddingLanding() {
   const [selectedGift, setSelectedGift] = useState<Gift | null>(null);
   const [selectedPixId, setSelectedPixId] = useState(pixAccounts[0].id);
   const [copiedPix, setCopiedPix] = useState(false);
-  const [presenceSent, setPresenceSent] = useState(false);
+  const [presenceStatus, setPresenceStatus] = useState<
+    "idle" | "submitting" | "success" | "error"
+  >("idle");
+  const [presenceMessage, setPresenceMessage] = useState("");
 
   useEffect(() => {
     setCountdownTime(getCountdownTime());
@@ -191,9 +195,54 @@ export function WeddingLanding() {
     setCopiedPix(true);
   }
 
-  function submitPresence(event: FormEvent<HTMLFormElement>) {
+  async function submitPresence(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setPresenceSent(true);
+    setPresenceStatus("submitting");
+    setPresenceMessage("");
+
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    const attendance = String(formData.get("attendance") ?? "");
+    const isConfirmed = attendance === "sim";
+    const adultCount = Number(formData.get("adultCount") ?? 0);
+    const childCount = Number(formData.get("childCount") ?? 0);
+    const companions = isConfirmed ? Math.max(0, adultCount + childCount) : 0;
+    const adultNames = String(formData.get("adultNames") ?? "").trim();
+    const childNames = String(formData.get("childNames") ?? "").trim();
+    const message = String(formData.get("message") ?? "").trim();
+    const notes = [
+      adultNames ? `Adultos:\n${adultNames}` : "",
+      childNames ? `Crianças:\n${childNames}` : "",
+      message ? `Mensagem:\n${message}` : "",
+    ]
+      .filter(Boolean)
+      .join("\n\n");
+
+    try {
+      const supabase = getSupabaseBrowserClient();
+      const { error } = await supabase.from("rsvp_confirmations").insert({
+        name: String(formData.get("guestName") ?? "").trim(),
+        phone: String(formData.get("phone") ?? "").trim(),
+        companions,
+        status: isConfirmed ? "confirmed" : "declined",
+        notes: notes || null,
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      form.reset();
+      setPresenceStatus("success");
+      setPresenceMessage("Confirmação enviada com sucesso. Obrigado pelo carinho!");
+    } catch (error) {
+      setPresenceStatus("error");
+      setPresenceMessage(
+        error instanceof Error
+          ? error.message
+          : "Não foi possível enviar sua confirmação. Tente novamente.",
+      );
+    }
   }
 
   return (
@@ -556,11 +605,14 @@ export function WeddingLanding() {
               </label>
             </div>
 
-            <button type="submit">Enviar confirmação</button>
-            {presenceSent && (
-              <p className="form-feedback">
-                Confirmação preparada com sucesso. A integração de envio será
-                definida em uma próxima etapa.
+            <button type="submit" disabled={presenceStatus === "submitting"}>
+              {presenceStatus === "submitting"
+                ? "Enviando..."
+                : "Enviar confirmação"}
+            </button>
+            {presenceMessage && (
+              <p className={`form-feedback form-feedback-${presenceStatus}`}>
+                {presenceMessage}
               </p>
             )}
           </form>

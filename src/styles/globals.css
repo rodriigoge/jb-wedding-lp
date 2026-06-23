@@ -831,6 +831,16 @@ a {
   padding: 12px;
 }
 
+.form-feedback-success {
+  border-color: rgba(78, 159, 116, 0.28);
+  background: rgba(234, 247, 239, 0.74);
+}
+
+.form-feedback-error {
+  border-color: rgba(180, 91, 99, 0.28);
+  background: rgba(253, 236, 238, 0.76);
+}
+
 @media (max-width: 760px) {
   html {
     scroll-padding-top: 72px;

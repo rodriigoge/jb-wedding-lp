@@ -50,9 +50,21 @@ Todos os assets usados pela aplicação ficam em `public/assets/`, pois essa é 
 
 No código, as imagens são referenciadas com caminhos como `/assets/nome-do-arquivo.webp`.
 
+## Supabase
+
+O formulário de confirmação de presença salva dados na tabela `rsvp_confirmations`.
+
+Variáveis usadas pela landing:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://ziyjazqtbxnumvqhlnte.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sua-publishable-key
+```
+
+O envio público usa apenas a publishable key. A secret key não deve ser usada na landing page.
+
 ## Observações
 
 - O site ainda não processa pagamentos.
 - O modal de presentes apenas exibe dados Pix e permite copiar a chave.
-- O formulário de presença ainda não envia dados para backend ou painel administrativo.
-- A integração de envio/registro pode ser adicionada em uma próxima etapa.
+- O formulário de presença envia os dados para o Supabase.
