@@ -150,6 +150,24 @@ function getCountdownTime(): CountdownTime {
   };
 }
 
+function formatPhone(value: string) {
+  const digits = value.replace(/\D/g, "").slice(0, 11);
+
+  if (digits.length <= 2) {
+    return digits;
+  }
+
+  if (digits.length <= 6) {
+    return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+  }
+
+  if (digits.length <= 10) {
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+  }
+
+  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+}
+
 export function WeddingLanding() {
   const [countdownTime, setCountdownTime] = useState<CountdownTime | null>(null);
   const [selectedGift, setSelectedGift] = useState<Gift | null>(null);
@@ -195,6 +213,10 @@ export function WeddingLanding() {
     setCopiedPix(true);
   }
 
+  function handlePhoneInput(event: FormEvent<HTMLInputElement>) {
+    event.currentTarget.value = formatPhone(event.currentTarget.value);
+  }
+
   async function submitPresence(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setPresenceStatus("submitting");
@@ -204,9 +226,18 @@ export function WeddingLanding() {
     const formData = new FormData(form);
     const attendance = String(formData.get("attendance") ?? "");
     const isConfirmed = attendance === "sim";
+    const rsvpStatus =
+      attendance === "sim"
+        ? "confirmed"
+        : attendance === "pendente"
+          ? "pending"
+          : "declined";
     const adultCount = Number(formData.get("adultCount") ?? 0);
     const childCount = Number(formData.get("childCount") ?? 0);
-    const companions = isConfirmed ? Math.max(0, adultCount + childCount) : 0;
+    const adultCompanions = Math.max(0, adultCount - 1);
+    const companions = isConfirmed
+      ? Math.max(0, adultCompanions + childCount)
+      : 0;
     const adultNames = String(formData.get("adultNames") ?? "").trim();
     const childNames = String(formData.get("childNames") ?? "").trim();
     const message = String(formData.get("message") ?? "").trim();
@@ -224,7 +255,7 @@ export function WeddingLanding() {
         name: String(formData.get("guestName") ?? "").trim(),
         phone: String(formData.get("phone") ?? "").trim(),
         companions,
-        status: isConfirmed ? "confirmed" : "declined",
+        status: rsvpStatus,
         notes: notes || null,
       });
 
@@ -542,7 +573,15 @@ export function WeddingLanding() {
               </label>
               <label>
                 <span>Telefone ou WhatsApp</span>
-                <input name="phone" type="tel" required />
+                <input
+                  name="phone"
+                  type="tel"
+                  inputMode="tel"
+                  maxLength={15}
+                  placeholder="(35) 99999-9999"
+                  onInput={handlePhoneInput}
+                  required
+                />
               </label>
               <fieldset>
                 <legend>Confirmação</legend>
@@ -559,21 +598,25 @@ export function WeddingLanding() {
                   <input name="attendance" type="radio" value="nao" />
                   <span>Não poderei comparecer.</span>
                 </label>
+                <label>
+                  <input name="attendance" type="radio" value="pendente" />
+                  <span>Ainda não sei, deixarei pendente.</span>
+                </label>
               </fieldset>
             </div>
 
             <div className="form-section">
               <h3>Acompanhantes adultos</h3>
               <label>
-                <span>Quantidade de adultos</span>
-                <input name="adultCount" type="number" min="0" defaultValue="0" />
+                <span>Quantidade total de adultos, incluindo você</span>
+                <input name="adultCount" type="number" min="1" defaultValue="1" />
               </label>
               <label>
-                <span>Nomes dos adultos</span>
+                <span>Nomes dos adultos, incluindo você</span>
                 <textarea
                   name="adultNames"
                   rows={3}
-                  placeholder="Informe um nome por linha."
+                  placeholder="Informe um nome por linha, incluindo o seu."
                 />
               </label>
             </div>
